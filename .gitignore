@@ -1,2 +1,4 @@
-/dataset
+/audio-emotion-dataset
 /venv
+/roberta
+/assets/nltk_data
