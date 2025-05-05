@@ -1,6 +1,6 @@
 conda
     conda create -n myenv python=3.10
-    conda activate myenv
+    conda activate my_env
     conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
 
     conda env export > environment.yaml
