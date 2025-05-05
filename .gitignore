@@ -4,4 +4,9 @@
 /assets/nltk_data
 /CNN
 /Wav2Vec2
+/wav2vec2_emotion_classifier
+/wav2vec2_emotion_classifier_best
+/wav2vec2_emotion_classifier_best_v2
+/RF
+/SVM
 /HUBERT
