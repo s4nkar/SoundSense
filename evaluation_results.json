@@ -76,6 +76,12 @@
         "recall_macro": 48.703185914496785,
         "f1_macro": 46.70870971436361
     },
+    "roberta": {
+        "accuracy": 95.08,
+        "precision_macro": 95.20,
+        "recall_macro": 95.04,
+        "f1_macro": 95.08
+    },
     "wav2vec2": {
         "accuracy": 78.10611148421759,
         "precision_macro": 78.0453863070418,
