@@ -30,3 +30,12 @@ SoundSense is a research project focused on detecting emotional mismatches betwe
 - Trained models  
 
 ---
+
+## 📦 Getting Started
+
+Clone the project:
+
+```bash
+git clone https://github.com/s4nkar/SoundSense.git
+cd SoundSense
+# run main.ipynb if you already have trained models
