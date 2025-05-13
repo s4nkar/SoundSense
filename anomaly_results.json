@@ -1,0 +1,22 @@
+{
+    "status": "\u2757 Mismatch detected: Text and voice emotions do not align clearly. Possible vocal anomaly.",
+    "match_ratio": 0.25,
+    "text_emotion": "fear",
+    "expected_audio_emotions": [
+        "FEA",
+        "DIS"
+    ],
+    "audio_predictions": [
+        "HAP",
+        "HAP",
+        "ANG",
+        "FEA"
+    ],
+    "audio_input": "audio-emotion-dataset/1001_IWW_FEA_XX.wav",
+    "audio_text": "i wonder what this is abel",
+    "roberta_text_emotion": "fear",
+    "wav2vec2_audio_emotion": "happy",
+    "cnn_audio_emotion": "happy",
+    "svm_audio_emotion": "angry",
+    "rf_audio_emotion": "fear"
+}
