@@ -107,3 +107,108 @@ def ml_model_extract_features(file_path):
     rms = np.mean(librosa.feature.rms(y=y).T, axis=0) #RMS (Root Mean Square Energy) – correlates with loudness.
 
     return np.hstack([mfcc, chroma, contrast, zcr, rms])
+
+
+import librosa
+import soundfile as sf
+import numpy as np
+import os
+
+def convert_wav_audio(file_path, target_sr=16000, output_dir="test/normalised"):
+    """
+    Load a WAV file, fix format issues (e.g., convert stereo to mono), and save the corrected file in the output directory.
+    Ensures the output is a 1D (mono) or 2D (batched mono) array with shape [length] or [1, length].
+    
+    Args:
+        file_path (str): Path to the input WAV file.
+        target_sr (int): Target sample rate (default: 16000 Hz).
+        output_dir (str): Directory to save the corrected WAV file (default: 'test/normalised').
+    
+    Returns:
+        tuple: (audio_data, sample_rate, output_path)
+            - audio_data: NumPy array of shape [length] (mono) or [1, length] (batched mono).
+            - sample_rate: Sample rate of the audio.
+            - output_path: Path to the saved corrected WAV file.
+    
+    Raises:
+        ValueError: If the file is not a valid WAV or cannot be processed.
+    """
+    try:
+        # Validate input file existence
+        if not os.path.isfile(file_path):
+            raise ValueError(f"Input file does not exist: {file_path}")
+        
+        # Load audio file
+        audio, sr = librosa.load(file_path, sr=target_sr, mono=False)
+        
+        # Check if audio is stereo (2 channels)
+        needs_conversion = audio.ndim > 1 and audio.shape[0] == 2
+        
+        if needs_conversion:
+            # Convert stereo to mono by averaging channels
+            audio = np.mean(audio, axis=0)
+        
+        # Ensure audio is 1D (mono)
+        if audio.ndim > 1:
+            audio = audio.squeeze()
+        
+        # Reshape to [1, length] for batched conv1d compatibility
+        audio = audio.reshape(1, -1) if audio.ndim == 1 else audio
+        
+        # Validate shape for conv1d (should be [1, length] or [length])
+        if audio.ndim not in [1, 2] or (audio.ndim == 2 and audio.shape[0] != 1):
+            raise ValueError(f"Unexpected audio shape after processing: {audio.shape}")
+        
+        # Create output directory if it doesn't exist
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # Define output file path with 'corrected_' prefix to avoid overwriting
+        file_name = os.path.basename(file_path)
+        output_path = os.path.join(output_dir, f"{file_name}")
+        
+        # Save the corrected audio (use 1D array for writing)
+        sf.write(output_path, audio.squeeze(), sr)
+        
+        print(f"Corrected audio saved to: {output_path}")
+        return audio, sr, output_path
+    
+    except Exception as e:
+        # Fallback to soundfile if librosa fails
+        try:
+            audio, sr = sf.read(file_path)
+            
+            # Convert to mono if stereo
+            needs_conversion = audio.ndim > 1 and audio.shape[1] == 2
+            if needs_conversion:
+                audio = np.mean(audio, axis=1)
+            
+            # Ensure 1D or [1, length]
+            if audio.ndim > 1:
+                audio = audio.squeeze()
+            
+            # Resample if necessary
+            if sr != target_sr:
+                audio = librosa.resample(audio, orig_sr=sr, target_sr=target_sr)
+                sr = target_sr
+            
+            # Reshape to [1, length]
+            audio = audio.reshape(1, -1) if audio.ndim == 1 else audio
+            
+            if audio.ndim not in [1, 2] or (audio.ndim == 2 and audio.shape[0] != 1):
+                raise ValueError(f"Unexpected audio shape after processing: {audio.shape}")
+            
+            # Create output directory if it doesn't exist
+            os.makedirs(output_dir, exist_ok=True)
+            
+            # Define output file path with 'corrected_' prefix
+            file_name = os.path.basename(file_path)
+            output_path = os.path.join(output_dir, f"{file_name}")
+            
+            # Save the corrected audio
+            sf.write(output_path, audio.squeeze(), sr)
+            
+            print(f"Corrected audio saved to: {output_path}")
+            return audio, sr, output_path
+        
+        except Exception as e2:
+            raise ValueError(f"Failed to process WAV file: {str(e)} | {str(e2)}")
